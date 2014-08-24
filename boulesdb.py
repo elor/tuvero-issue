@@ -24,11 +24,11 @@ def getPlayers():
         players.append(player.name.encode('utf-8'))
     return players
 
-class DataPage(webapp2.RequestHandler):
+class JSONPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
-        self.response.write('[%s]'%', '.join(getPlayers()))
+        self.response.write('["%s"]'%'", "'.join(getPlayers()))
 
 class TxtPage(webapp2.RequestHandler):
     def get(self):
@@ -88,6 +88,7 @@ class PlayerEntry(webapp2.RequestHandler):
                 playername = self.request.get('playername')
                 
                 # TODO verifications
+                playername = playername.replace('"', '')
                 
                 player = Player(key=player_key(playername))
                 player.name = playername;
@@ -100,7 +101,7 @@ class PlayerEntry(webapp2.RequestHandler):
                 self.response.write("No write access for user %s"%user.email())
 
 application = webapp2.WSGIApplication([
-    ('/json', DataPage),
+    ('/json', JSONPage),
     ('/txt', TxtPage),
     ('/text', TxtPage),
     ('/plain', TxtPage),
