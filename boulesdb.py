@@ -53,7 +53,8 @@ Spieler:<br>
 """
 
 def validUser(user):
-    if user.email() == "ebriigisto@gmail.com":
+#    if user.email() == "ebriigisto@gmail.com":
+    if user:
         return True
     else:
         return False

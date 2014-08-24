@@ -9,5 +9,11 @@ libraries:
   version: latest
 
 handlers:
+- url: /
+  script: boulesdb.application
+  login: admin
+  secure: always
+
 - url: /.*
   script: boulesdb.application
+  secure: always
