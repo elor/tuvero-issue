@@ -28,7 +28,13 @@ class DataPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
-        self.response.write('{players: [%s]}'%', '.join(getPlayers()))
+        self.response.write('[%s]'%', '.join(getPlayers()))
+
+class TxtPage(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.write('\n'.join(getPlayers()))
 
 # add new players
 EDIT_PAGE_TEMPLATE = """
@@ -95,6 +101,10 @@ class PlayerEntry(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
     ('/json', DataPage),
+    ('/txt', TxtPage),
+    ('/text', TxtPage),
+    ('/plain', TxtPage),
+    ('/raw', TxtPage),
     ('/', EditPage),
     ('/new', PlayerEntry),
 ], debug=True)
