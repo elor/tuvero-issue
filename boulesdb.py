@@ -52,31 +52,45 @@ Spieler:<br>
 </html>
 """
 
+def validUser(user):
+    if user.email() == "ebriigisto@gmail.com":
+        return True
+    else:
+        return False
+
 class EditPage(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         if user:
-            self.response.headers['Content-Type'] = 'text/html'
-            self.response.write(EDIT_PAGE_TEMPLATE%'<br>'.join(getPlayers()))
+            if validUser(user):
+                self.response.headers['Content-Type'] = 'text/html'
+                self.response.write(EDIT_PAGE_TEMPLATE%'<br>'.join(getPlayers()))
+            else:
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.write("No write access for user %s"%user.email())
         else:
             self.redirect(users.create_login_url(self.request.uri))
 
 class PlayerEntry(webapp2.RequestHandler):
-    def post(self):
+    def get(self):
         user = users.get_current_user()
         if not user:
             self.redirect(users.create_login_url(self.request.uri))
         else:
-            playername = self.request.get('playername')
-
-            # TODO verifications
-
-            player = Player(key=player_key(playername))
-            player.name = playername;
-            player.put()
-            
-            query_params = {'added': playername.encode('utf-8')}
-            self.redirect('/')
+            if validUser(user):
+                playername = self.request.get('playername')
+                
+                # TODO verifications
+                
+                player = Player(key=player_key(playername))
+                player.name = playername;
+                player.put()
+                
+                query_params = {'added': playername.encode('utf-8')}
+                self.redirect('/')
+            else:
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.write("No write access for user %s"%user.email())
 
 application = webapp2.WSGIApplication([
     ('/json', DataPage),

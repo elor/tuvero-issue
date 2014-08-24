@@ -9,9 +9,5 @@ libraries:
   version: latest
 
 handlers:
-- url: /
-  script: boulesdb.application
-  login: admin
-
-- url: /json
+- url: /.*
   script: boulesdb.application
