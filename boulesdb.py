@@ -62,7 +62,7 @@ class EditPage(webapp2.RequestHandler):
             self.redirect(users.create_login_url(self.request.uri))
 
 class PlayerEntry(webapp2.RequestHandler):
-    def get(self):
+    def post(self):
         user = users.get_current_user()
         if not user:
             self.redirect(users.create_login_url(self.request.uri))
@@ -76,10 +76,10 @@ class PlayerEntry(webapp2.RequestHandler):
             player.put()
             
             query_params = {'added': playername.encode('utf-8')}
-            self.redirect('/edit?' + urllib.urlencode(query_params))
+            self.redirect('/')
 
 application = webapp2.WSGIApplication([
-    ('/', DataPage),
-    ('/edit', EditPage),
+    ('/json', DataPage),
+    ('/', EditPage),
     ('/new', PlayerEntry),
 ], debug=True)
