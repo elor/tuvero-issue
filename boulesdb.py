@@ -28,6 +28,7 @@ class JSONPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
         self.response.write('["%s"]'%'", "'.join(getPlayers()))
 
 class TxtPage(webapp2.RequestHandler):
