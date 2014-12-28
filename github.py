@@ -49,7 +49,7 @@ class GitHub:
     def formatIssue(self, message):
         text = message['message']
         if not text:
-            text = 'No bug description given'
+            text = 'Keine Beschreibung angegeben'
         text = text.strip() + '\n\n'
 
         try:
@@ -60,13 +60,13 @@ class GitHub:
 
         try:
             if message['user']:
-                text += 'User: %s\n'%message['user']
+                text += 'Benutzer: %s\n'%message['user']
         except:
             pass
 
         try:
             if message['saveurl']:
-                text += 'Save File URL: %s\n'%message['saveurl']
+                text += 'Anhang: %s\n'%message['saveurl']
         except:
             pass
 
@@ -74,9 +74,9 @@ class GitHub:
 
         return text
 
-    def createIssue(self, message, savedata):
+    def createIssue(self, message, savedata=None, savefilename=None):
         if savedata:
-            gisturl = self.createGist('%s/%s save file for with title "%s"'%(self.owner, self.repo, message['title']), None, savedata)
+            gisturl = self.createGist('%s/%s attachment for issue with title "%s"'%(self.owner, self.repo, message['title']), savefilename, savedata)
             message['saveurl'] = gisturl
 
         postdata = {

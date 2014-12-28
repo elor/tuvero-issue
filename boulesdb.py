@@ -100,8 +100,7 @@ def validUser(user):
         return False
 
 def validAdmin(user):
-#    if users.is_current_user_admin():
-    if True:
+    if users.is_current_user_admin():
         return True
     else:
         return False
@@ -114,7 +113,7 @@ class EditPage(webapp2.RequestHandler):
                 self.response.headers['Content-Type'] = 'text/html'
                 self.response.write(EDIT_PAGE_TEMPLATE%'<br>'.join(getPlayers()))
             else:
-                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
                 self.response.write("No write access for user %s"%user.email())
         else:
             self.redirect(users.create_login_url(self.request.uri))
@@ -138,7 +137,7 @@ class PlayerEntry(webapp2.RequestHandler):
                 query_params = {'added': playername.encode('utf-8')}
                 self.redirect('/')
             else:
-                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
                 self.response.write("No write access for user %s"%user.email())
 
 class CredentialsUpdate(webapp2.RequestHandler):
@@ -174,7 +173,7 @@ class CredentialsUpdate(webapp2.RequestHandler):
                 
 
             else:
-                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
                 self.response.write("No write access for user %s"%user.email())
 
     def post(self):
@@ -183,7 +182,7 @@ class CredentialsUpdate(webapp2.RequestHandler):
             self.redirect(users.create_login_url(self.request.uri))
         else:
             if validAdmin(user):
-#                try:
+                try:
                     owner = self.request.POST['github_owner']
                     repo = self.request.POST['github_repo']
                     token = self.request.POST['github_token']
@@ -192,13 +191,12 @@ class CredentialsUpdate(webapp2.RequestHandler):
 
                     sleep(1)
 
-                    # TODO redirect somewhere useful
                     self.redirect(self.request.uri)
-#                except:
-#                    self.response.headers['Content-Type'] = 'text/plain'
-#                    self.response.write("No write access for user %s"%user.email())
+                except:
+                    self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+                    self.response.write("No write access for user %s"%user.email())
             else:
-                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
                 self.response.write("No write access for user %s"%user.email())
 
 class IssuePage(webapp2.RequestHandler):
@@ -208,10 +206,74 @@ class IssuePage(webapp2.RequestHandler):
             username = 'anonymous'
         else:
             username = user.nickname()
-        
-        self.response.write("Username: %s<br>"%username)
-        self.response.write('<a href="issue">%s</a>'%username)
 
+        self.response.write("""
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Boules - Fehler melden</title>
+<style>
+
+body {
+        text-align: center;
+}
+
+input[type=text],textarea {
+text-align: left;
+min-height: 34px;
+width: 40em;
+padding: 7px 8px;
+font-size: 13px;
+color: #333;
+background-color: #fff;
+border: 1px solid #ccc;
+border-radius: 3px;
+outline: none;
+box-shadow: inset 0 1px 2px rgba(0,0,0,0.075)
+}
+
+input[type=text][name=title] {
+font-size: 16px;
+width: 32.5em;
+}
+
+
+input[type=submit] {
+margin: 5px;
+min-height: 34px;
+font-size: 16px;
+background-color: #3f3;
+border-radius: 3px;
+border-color: #5ca941;
+border-width: 1px;
+text-shadow: rgba(0, 0, 0, 0.247059) 0px -1px 0px;
+cursor: pointer;
+background-color: rgb(96, 176, 68);
+background-image: linear-gradient(rgb(138, 221, 109), rgb(96, 176, 68));
+color: white;
+font-weight: bold;
+padding: 7px 12px;
+}
+
+</style>
+</head>
+<body>
+<form action='%s' method="POST" enctype="multipart/form-data">
+                <h1>Boules Turnierverwaltung - Fehler melden</h1>
+                <input name="title" type="text" placeholder="Titel" /><br>
+                Bitte beschreiben sie das Problem<br>
+                <textarea rows="10" name="message" type="text" placeholder="Beschreibung"/></textarea><br>
+                <input name="version" type="text" placeholder="Version (erwünscht)" /><br>
+                <input name="user" type="text" placeholder="Benutzer (optional)" /><br>
+                Anhang (optional, z.B. für Speicherstände):<br>
+                <input name="save" type="file" /><br>
+                <input type="submit" value="Fehlerbericht abschicken"/>
+</form>
+</body>
+</html>
+                """%self.request.uri)
+        
     def post(self):
         try:
             message = {
@@ -222,43 +284,48 @@ class IssuePage(webapp2.RequestHandler):
             }
         except KeyError as err:
             self.response.status = 400
-            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
             self.response.write('Missing Key: "%s"'%err.message)
             return
 
         # savedata: data from the save button
         try:
             savedata = self.request.POST['save']
+            savefilename = savedata.filename
+            savedata = savedata.file.read()
         except KeyError:
-            savedata = ''
+            savefilename = None
+            savedata = None
+
 
         try:
             ghcreds = get_githubcredentials()
         except:
-            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
             self.response.write('Missing Key: "%s"'%err.message)
             return
 
         gh = GitHub(ghcreds.owner, ghcreds.repo, ghcreds.token)
         url = ''
         try:
-            url = gh.createIssue(message, savedata)
+            url = gh.createIssue(message, savedata, savefilename)
         except:
             pass
 
         if url:
             # everything's fine
-            self.response.status = 201
-            self.response.headers['Content-Type'] = 'text/plain'
-            self.response.write(url)
+#            self.response.status = 201
+#            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+#            self.response.write(url)
+            self.redirect(url)
         else:
             self.response.status = 500
-            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
             self.response.write("Server Error: cannot create issue. This might be caused by missing or invalid values")
 
 class PubKeyPage(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
         self.response.write("TODO: read pubkey from database or generate a disposable one")
 
 application = webapp2.WSGIApplication([
