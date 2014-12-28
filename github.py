@@ -85,3 +85,9 @@ class GitHub:
         }
 
         return self._post(self.repourl + '/issues', postdata)['url']
+
+    def hasPushAccess(self):
+        try:
+            return self._get(self.repourl)['permissions']['push']
+        except:
+            return False

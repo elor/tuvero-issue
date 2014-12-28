@@ -1,5 +1,7 @@
 2014-12-28	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
 
 	* github.py: github gist/issue API added
+	hasPushAccess() added for easy token validation
 
 	* boulesdb.py: POST-based issue creation written
+	possibility for storing and setting the github access token added

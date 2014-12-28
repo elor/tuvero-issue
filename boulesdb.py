@@ -5,6 +5,8 @@ import webapp2
 import urllib
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from time import sleep
+from github import GitHub
 
 class Player(ndb.Model):
     name = ndb.StringProperty()
@@ -16,18 +18,28 @@ class GitHubCredentials(ndb.Model):
     token = ndb.StringProperty()
     modified = ndb.DateTimeProperty(auto_now=True)
 
+def set_githubcredentials(owner, repo, token):
+    creds = get_githubcredentials()
+    if owner:
+        creds.owner = owner
+    if repo:
+        creds.repo = repo
+    if token:
+        creds.token = token
+    creds.put()
+
 def get_githubcredentials():
     query = GitHubCredentials.query().order(Player.modified)
-    entries = allplayers_query.fetch(10)
+    entries = query.fetch(10)
     if len(entries) > 1:
         # TODO send email or something...
-        raise RuntimeError("More than one GitHubCredentials entry in the database!")
+        for entry in entries:
+            entry.key.delete()
+        entries = []
+    if len(entries) == 0:
+        return GitHubCredentials(owner='', repo='', token='')
 
-    return {
-        'owner': entries[0].owner,
-        'repo': entries[0].repo,
-        'token': entries[0].token,
-    }
+    return entries[0]
 
 NONAME = "nobody"
 
@@ -87,6 +99,13 @@ def validUser(user):
     else:
         return False
 
+def validAdmin(user):
+#    if users.is_current_user_admin():
+    if True:
+        return True
+    else:
+        return False
+
 class EditPage(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
@@ -118,6 +137,66 @@ class PlayerEntry(webapp2.RequestHandler):
                 
                 query_params = {'added': playername.encode('utf-8')}
                 self.redirect('/')
+            else:
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.write("No write access for user %s"%user.email())
+
+class CredentialsUpdate(webapp2.RequestHandler):
+    def get(self):
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+        else:
+            if validAdmin(user):
+                creds = get_githubcredentials()
+
+                self.response.write("""
+<form action='%s' method="POST">
+                Github Repository Owner: <input name="github_owner" type="text" value="%s" /><br>
+                Github Repository Name: <input name="github_repo" type="text" value="%s" /><br>
+                Github Access Token (always hidden): <input name="github_token" type="text" placeholder="access token" /><br>
+                <input type="submit" />
+</form>
+                """%(self.request.uri, creds.owner, creds.repo))
+
+                hasAccess = False
+                ghcreds = get_githubcredentials()
+                gh = GitHub(creds.owner, creds.repo, creds.token)
+                try:
+                    hasAccess = gh.hasPushAccess()
+                except:
+                    pass
+                
+                if hasAccess:
+                    self.response.write("<p>Push Access Granted by GitHub.com</p>")
+                else:
+                    self.response.write("<p>WARNING: No push access with the stored token and repo information. Please provide valid information</p>")
+                
+
+            else:
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.write("No write access for user %s"%user.email())
+
+    def post(self):
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+        else:
+            if validAdmin(user):
+#                try:
+                    owner = self.request.POST['github_owner']
+                    repo = self.request.POST['github_repo']
+                    token = self.request.POST['github_token']
+
+                    set_githubcredentials(owner, repo, token)
+
+                    sleep(1)
+
+                    # TODO redirect somewhere useful
+                    self.redirect(self.request.uri)
+#                except:
+#                    self.response.headers['Content-Type'] = 'text/plain'
+#                    self.response.write("No write access for user %s"%user.email())
             else:
                 self.response.headers['Content-Type'] = 'text/plain'
                 self.response.write("No write access for user %s"%user.email())
@@ -190,5 +269,6 @@ application = webapp2.WSGIApplication([
     ('/raw', TxtPage),
     ('/', EditPage),
     ('/new', PlayerEntry),
-    ('/issue', IssuePage)
+    ('/issue', IssuePage),
+    ('/githubsettings', CredentialsUpdate)
 ], debug=True)
