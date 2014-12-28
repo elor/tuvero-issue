@@ -2,6 +2,7 @@
 
 	* github.py: github gist/issue API added
 	hasPushAccess() added for easy token validation
+	url -> html_url. Users don't need the API URL
 
 	* boulesdb.py: POST-based issue creation written
 	possibility for storing and setting the github access token added

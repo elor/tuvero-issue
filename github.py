@@ -44,7 +44,7 @@ class GitHub:
             },
         }
 
-        return self._post('gists', postdata)['url']
+        return self._post('gists', postdata)['html_url']
 
     def formatIssue(self, message):
         text = message['message']
@@ -84,7 +84,7 @@ class GitHub:
             'body': self.formatIssue(message),
         }
 
-        return self._post(self.repourl + '/issues', postdata)['url']
+        return self._post(self.repourl + '/issues', postdata)['html_url']
 
     def hasPushAccess(self):
         try:
