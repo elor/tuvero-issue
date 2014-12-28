@@ -288,12 +288,25 @@ padding: 7px 12px;
             self.response.write('Missing Key: "%s"'%err.message)
             return
 
+        if not message['title']:
+            self.response.status = 400
+            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+            self.response.write('Der Titel der Fehlermeldung wurde nicht angegeben')
+            return
+
+        if not message['message']:
+            self.response.status = 400
+            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+            self.response.write('Die Beschreibung der Fehlermeldung wurde nicht angegeben')
+            return
+            
+
         # savedata: data from the save button
         try:
             savedata = self.request.POST['save']
             savefilename = savedata.filename
             savedata = savedata.file.read()
-        except KeyError:
+        except:
             savefilename = None
             savedata = None
 
@@ -317,7 +330,7 @@ padding: 7px 12px;
 #            self.response.status = 201
 #            self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
 #            self.response.write(url)
-            self.redirect(url)
+            self.redirect(url.encode('ascii', 'ignore'))
         else:
             self.response.status = 500
             self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
