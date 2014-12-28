@@ -10,6 +10,25 @@ class Player(ndb.Model):
     name = ndb.StringProperty()
     modified = ndb.DateTimeProperty(auto_now=True)
 
+class GitHubCredentials(ndb.Model):
+    owner = ndb.StringProperty()
+    repo = ndb.StringProperty()
+    token = ndb.StringProperty()
+    modified = ndb.DateTimeProperty(auto_now=True)
+
+def get_githubcredentials():
+    query = GitHubCredentials.query().order(Player.modified)
+    entries = allplayers_query.fetch(10)
+    if len(entries) > 1:
+        # TODO send email or something...
+        raise RuntimeError("More than one GitHubCredentials entry in the database!")
+
+    return {
+        'owner': entries[0].owner,
+        'repo': entries[0].repo,
+        'token': entries[0].token,
+    }
+
 NONAME = "nobody"
 
 def player_key(name=NONAME):
@@ -28,7 +47,9 @@ class JSONPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
-        self.response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+        self.response.headers['Access-Control-Allow-Credentials'] = 'true'
+        self.response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
+        self.response.headers['Access-Control-Allow-Headers'] = 'x-requested-with, x-requested-by'
         self.response.write('["%s"]'%'", "'.join(getPlayers()))
 
 class TxtPage(webapp2.RequestHandler):
@@ -101,6 +122,66 @@ class PlayerEntry(webapp2.RequestHandler):
                 self.response.headers['Content-Type'] = 'text/plain'
                 self.response.write("No write access for user %s"%user.email())
 
+class IssuePage(webapp2.RequestHandler):
+    def get(self):
+        user = users.get_current_user()
+        if not user:
+            username = 'anonymous'
+        else:
+            username = user.nickname()
+        
+        self.response.write("Username: %s<br>"%username)
+        self.response.write('<a href="issue">%s</a>'%username)
+
+    def post(self):
+        try:
+            message = {
+                'title': self.request.POST['title'],
+                'user': self.request.POST['user'],
+                'message': self.request.POST['message'],
+                'version': self.request.POST['version'],
+            }
+        except KeyError as err:
+            self.response.status = 400
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write('Missing Key: "%s"'%err.message)
+            return
+
+        # savedata: data from the save button
+        try:
+            savedata = self.request.POST['save']
+        except KeyError:
+            savedata = ''
+
+        try:
+            ghcreds = get_githubcredentials()
+        except:
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write('Missing Key: "%s"'%err.message)
+            return
+
+        gh = GitHub(ghcreds['owner'], ghcreds['repo'], ghcreds['token'])
+        url = ''
+        try:
+            url = gh.createIssue(message, savedata)
+        except:
+            pass
+
+        if url:
+            # everything's fine
+            self.response.status = 201
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write(url)
+        else:
+            self.response.status = 500
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write("Server Error: cannot create issue. This might be caused by missing or invalid values")
+
+class PubKeyPage(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write("TODO: read pubkey from database or generate a disposable one")
+
 application = webapp2.WSGIApplication([
     ('/json', JSONPage),
     ('/txt', TxtPage),
@@ -109,4 +190,5 @@ application = webapp2.WSGIApplication([
     ('/raw', TxtPage),
     ('/', EditPage),
     ('/new', PlayerEntry),
+    ('/issue', IssuePage)
 ], debug=True)
