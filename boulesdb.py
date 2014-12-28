@@ -239,7 +239,7 @@ class IssuePage(webapp2.RequestHandler):
             self.response.write('Missing Key: "%s"'%err.message)
             return
 
-        gh = GitHub(ghcreds['owner'], ghcreds['repo'], ghcreds['token'])
+        gh = GitHub(ghcreds.owner, ghcreds.repo, ghcreds.token)
         url = ''
         try:
             url = gh.createIssue(message, savedata)

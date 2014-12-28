@@ -6,3 +6,5 @@
 
 	* boulesdb.py: POST-based issue creation written
 	possibility for storing and setting the github access token added
+	dereferencing mistake fixed
+
