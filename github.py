@@ -30,7 +30,7 @@ class GitHub:
 
     def createGist(self, description, filename, content):
         if not filename:
-            filename = 'boules_%s.json'%time.strftime('%F_%X')
+            filename = 'issue_%s.json'%time.strftime('%F_%X')
         if not description:
             description = 'No Description'
 

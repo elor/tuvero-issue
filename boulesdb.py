@@ -212,7 +212,7 @@ class IssuePage(webapp2.RequestHandler):
 <html lang="de">
 <head>
 <meta charset="utf-8" />
-<title>Boules - Fehler melden</title>
+<title>Tuvero - Fehler melden</title>
 <style>
 
 body {
@@ -260,7 +260,7 @@ padding: 7px 12px;
 </head>
 <body>
 <form action='%s' method="POST" enctype="multipart/form-data">
-                <h1>Boules Turnierverwaltung - Fehler melden</h1>
+                <h1>Tuvero Turnierverwaltung - Fehler melden</h1>
                 <input name="title" type="text" placeholder="Titel" /><br>
                 Bitte beschreiben sie das Problem<br>
                 <textarea rows="10" name="message" type="text" placeholder="Beschreibung"/></textarea><br>

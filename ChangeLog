@@ -1,3 +1,9 @@
+2015-02-27	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
+
+	* boulesdb.py: Boules -> Tuvero
+
+	* github.py: boules -> tuvero
+
 2014-12-28	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
 
 	* github.py: github gist/issue API added
@@ -7,4 +13,3 @@
 	* boulesdb.py: POST-based issue creation written
 	possibility for storing and setting the github access token added
 	dereferencing mistake fixed
-
