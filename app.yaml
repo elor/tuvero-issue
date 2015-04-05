@@ -12,8 +12,8 @@ handlers:
 - url: /
   script: boulesdb.application
   login: admin
-  secure: always
+  secure: optional
 
 - url: /.*
   script: boulesdb.application
-  secure: always
+  secure: optional
