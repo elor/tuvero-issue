@@ -1,0 +1,13 @@
+body {
+  text-align: center;
+}
+
+form {
+  display: inline-block;
+  width: 45em;
+  text-align: center;
+}
+
+input[type="text"],textarea {
+  width: 40em;
+}

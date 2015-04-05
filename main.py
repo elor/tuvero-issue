@@ -123,66 +123,40 @@ class IssuePage(webapp2.RequestHandler):
 <head>
 <meta charset="utf-8" />
 <title>Tuvero - Fehler melden</title>
-<style>
-
-body {
-        text-align: center;
-}
-
-input[type=text],textarea {
-text-align: left;
-min-height: 34px;
-width: 40em;
-padding: 7px 8px;
-font-size: 13px;
-color: #333;
-background-color: #fff;
-border: 1px solid #ccc;
-border-radius: 3px;
-outline: none;
-box-shadow: inset 0 1px 2px rgba(0,0,0,0.075)
-}
-
-input[type=text][name=title] {
-font-size: 16px;
-width: 32.5em;
-}
-
-
-input[type=submit] {
-margin: 5px;
-min-height: 34px;
-font-size: 16px;
-background-color: #3f3;
-border-radius: 3px;
-border-color: #5ca941;
-border-width: 1px;
-text-shadow: rgba(0, 0, 0, 0.247059) 0px -1px 0px;
-cursor: pointer;
-background-color: rgb(96, 176, 68);
-background-image: linear-gradient(rgb(138, 221, 109), rgb(96, 176, 68));
-color: white;
-font-weight: bold;
-padding: 7px 12px;
-}
-
-</style>
 </head>
+<link rel="stylesheet" href="css/primer.css" />
+<link rel="stylesheet" href="css/issue.css" />
 <body>
 <form action='%s' method="POST" enctype="multipart/form-data">
-                <h1>Tuvero Turnierverwaltung - Fehler melden</h1>
-                <input name="title" type="text" placeholder="Titel" /><br>
-                Bitte beschreiben sie das Problem<br>
-                <textarea rows="10" name="message" type="text" placeholder="Beschreibung"/></textarea><br>
-                <input name="version" type="text" placeholder="Version (erwünscht)" /><br>
-                <input name="user" type="text" placeholder="Benutzer (optional)" /><br>
-                Anhang (optional, z.B. für Speicherstände):<br>
-                <input name="save" type="file" /><br>
-                <input type="submit" value="Fehlerbericht abschicken"/>
+<h1>Tuvero - Fehler melden</h1>
+<p>
+Für eine Liste aller gemeldeten Fehler und Verbesserungsvorschläge, siehe <a href="https://github.com/elor/tuvero/issues">https://github.com/elor/tuvero/issues</a>.
+</p>
+<p>
+<input name="title" type="text" placeholder="Titel (z.B. 'Ranking-Tab: leere Spalten bei KO-Turnier')" />
+</p>
+<h3>Ausführliche Problembeschreibung</h3>
+<textarea rows="10" name="message" type="text" placeholder="Ausführliche Beschreibung des Problems:
+Wie äußert sich der Fehler?
+Wie kann ich den Fehler hervorrufen?"/></textarea>
+<h3></h3>
+<p>
+<input name="version" type="text" placeholder="Version (erwünscht, z.B. '1.4.8')" />
+<input name="browser" type="text" placeholder="Betroffene Browser (erwünscht, z.B. 'Google Chrome')" />
+<input name="user" type="text" placeholder="Benutzer (optional, z.B. 'Fabe')" />
+</p>
+<p>
+Turnierstand anhängen (optional., z.B. 'boule.json'):
+<br>
+<input name="save" type="file" />
+</p>
+<p>
+<input class="btn btn-primary" type="submit" value="Fehlerbericht abschicken"/>
+</p>
 </form>
 </body>
 </html>
-                """%self.request.uri)
+"""%self.request.uri)
         
     def post(self):
         try:

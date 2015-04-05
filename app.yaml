@@ -17,3 +17,7 @@ handlers:
   script: main.application
   login: admin
   secure: always
+
+- url: /css/(.+\.css)
+  static_files: css/\1
+  upload: css/(.+\.css)

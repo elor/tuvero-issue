@@ -3,12 +3,17 @@
 	* app.yaml: renamed to tuvero-issue
 	urls updated to be on the first level
 	require admin and ssl for settings change
+	serving css/ subdirectory statically
 
 	* boulesdb.py: moved to main.py
 
 	* main.py: playerdb code removed
 	issue code retained
 	paths adjusted (/ and /settings)
+
+	* css/issue.css: project-specific formatting
+
+	* css/primer.css: see http://primercss.io/
 
 2015-02-27	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
 
