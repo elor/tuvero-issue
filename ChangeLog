@@ -1,3 +1,15 @@
+2015-04-05	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
+
+	* app.yaml: renamed to tuvero-issue
+	urls updated to be on the first level
+	require admin and ssl for settings change
+
+	* boulesdb.py: moved to main.py
+
+	* main.py: playerdb code removed
+	issue code retained
+	paths adjusted (/ and /settings)
+
 2015-02-27	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
 
 	* boulesdb.py: Boules -> Tuvero
