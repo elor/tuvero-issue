@@ -163,6 +163,7 @@ Turnierstand anhängen (optional., z.B. 'boule.json'):
             message = {
                 'title': self.request.POST['title'],
                 'user': self.request.POST['user'],
+                'browser': self.request.POST['browser'],
                 'message': self.request.POST['message'],
                 'version': self.request.POST['version'],
             }

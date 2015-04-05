@@ -59,6 +59,12 @@ class GitHub:
             pass
 
         try:
+            if message['browser']:
+                text += 'Browser: %s\n'%message['browser']
+        except:
+            pass
+
+        try:
             if message['user']:
                 text += 'Benutzer: %s\n'%message['user']
         except:

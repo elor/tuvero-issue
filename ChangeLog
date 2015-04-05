@@ -10,10 +10,13 @@
 	* main.py: playerdb code removed
 	issue code retained
 	paths adjusted (/ and /settings)
+	reading the "browser" field
 
 	* css/issue.css: project-specific formatting
 
 	* css/primer.css: see http://primercss.io/
+
+	* github.py: formatting with the "Browser" field
 
 2015-02-27	Erik E. Lorenz	<erik.e.lorenz@gmail.com>
 
