@@ -113,11 +113,24 @@ class IssuePage(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         if not user:
-            username = 'anonymous'
+            username = ''
         else:
             username = user.nickname()
 
-        self.response.write("""
+        browserstring = self.request.get('browser')
+        versionstring = self.request.get('version')
+        variantstring = self.request.get('variant')
+
+        if variantstring:
+            versionstring += " %s"%variantstring
+
+        if '>' in browserstring or '<' in browserstring:
+            browserstring = ''
+
+        if '>' in versionstring or '<' in versionstring:
+            versionstring = ''
+
+        self.response.write(u"""
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -141,9 +154,9 @@ Wie äußert sich der Fehler?
 Wie kann ich den Fehler hervorrufen?"/></textarea>
 <h3></h3>
 <p>
-<input name="version" type="text" placeholder="Version (erwünscht, z.B. '1.4.8')" />
-<input name="browser" type="text" placeholder="Betroffene Browser (erwünscht, z.B. 'Google Chrome')" />
-<input name="user" type="text" placeholder="Benutzer (optional, z.B. 'Fabe')" />
+<input name="version" type="text" placeholder="Version (erwünscht, z.B. '1.4.8')" value="%s" />
+<input name="browser" type="text" placeholder="Betroffene Browser (erwünscht, z.B. 'Google Chrome')" value="%s" />
+<input name="user" type="text" placeholder="Benutzer (optional, z.B. 'Fabe')" value="%s"/>
 </p>
 <p>
 Turnierstand anhängen (optional., z.B. 'boule.json'):
@@ -156,7 +169,7 @@ Turnierstand anhängen (optional., z.B. 'boule.json'):
 </form>
 </body>
 </html>
-"""%self.request.uri)
+"""%(self.request.uri, versionstring, browserstring, username))
         
     def post(self):
         try:
