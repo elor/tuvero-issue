@@ -136,6 +136,7 @@ class IssuePage(webapp2.RequestHandler):
 <head>
 <meta charset="utf-8" />
 <title>Tuvero - Fehler melden</title>
+<link rel="shortcut icon" href="favicon.png" type="image/png" />
 </head>
 <link rel="stylesheet" href="css/primer.css" />
 <link rel="stylesheet" href="css/issue.css" />
