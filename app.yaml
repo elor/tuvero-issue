@@ -21,3 +21,7 @@ handlers:
 - url: /css/(.+\.css)
   static_files: css/\1
   upload: css/(.+\.css)
+
+- url: /(.+\.png)
+  static_files: \1
+  upload: (.+\.png)
